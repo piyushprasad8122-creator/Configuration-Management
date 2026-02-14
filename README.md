@@ -1,7 +1,3 @@
-README.md (main file)
-
-This is the most important file.
-
 # SSH Key-Based Authentication Setup (EC2 Ubuntu)
 
 This project demonstrates how to set up secure SSH key-based authentication between two Ubuntu EC2 instances on AWS.
