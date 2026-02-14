@@ -1,3 +1,7 @@
+README.md (main file)
+
+This is the most important file.
+
 # SSH Key-Based Authentication Setup (EC2 Ubuntu)
 
 This project demonstrates how to set up secure SSH key-based authentication between two Ubuntu EC2 instances on AWS.
@@ -31,3 +35,43 @@ cat ~/.ssh/id_ed25519.pub
 chmod 700 ~/.ssh
 chmod 600 ~/.ssh/authorized_keys
 ssh ubuntu@<target-ip>
+Common Issue Explained
+
+ssh-copy-id fails on EC2 because password authentication is disabled by default. Manual key installation is required.
+
+Reference
+
+Project inspired by hands-on Linux and DevOps learning practices.
+
+
+---
+
+## 3. docs/architecture.md
+
+Explains what is happening conceptually (very good for interviews).
+
+```markdown
+# SSH Authentication Architecture
+
+## Components
+- Source EC2 Instance (client)
+- Target EC2 Instance (server)
+- SSH daemon (sshd)
+- Public / Private key pair
+
+## Authentication Flow
+1. Client sends public key identity
+2. Server checks `authorized_keys`
+3. Server sends encrypted challenge
+4. Client decrypts using private key
+5. Access granted if validation succeeds
+
+## Why EC2 Uses Key Authentication
+- No passwords to brute-force
+- Safer automation
+- Required for CI/CD and cloud scaling
+
+## Security Notes
+- Private keys never leave the client
+- Public keys are safe to distribute
+- Permissions on `.ssh` are mandatory
