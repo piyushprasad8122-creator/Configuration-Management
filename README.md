@@ -1,73 +1,146 @@
-# SSH Key-Based Authentication Setup (EC2 Ubuntu)
+Ansible Configuration Management Project
 
-This project demonstrates how to set up secure SSH key-based authentication between two Ubuntu EC2 instances on AWS.
+This project demonstrates how to use Ansible to automate the configuration and management of an Ubuntu server.
+It is based on the Configuration Management project from roadmap.sh and is designed for beginners who want hands-on experience with real DevOps tooling.
 
-The goal is to enable passwordless SSH access using modern SSH keys (ed25519), following Linux and cloud security best practices.
+Project link reference:
+https://roadmap.sh/projects/configuration-management
 
-## Project Objectives
-- Understand SSH public/private key authentication
-- Configure passwordless SSH between EC2 instances
-- Learn why `ssh-copy-id` fails on cloud servers
-- Manually install SSH keys securely
-- Apply correct Linux permissions for SSH
+Project Overview
 
-## Environment
-- Cloud Provider: AWS EC2
-- OS: Ubuntu Server
-- SSH Key Type: ed25519
-- Authentication: Key-based (no password)
+The goal of this project is to automate common server setup tasks using Ansible roles.
+Instead of configuring a server manually, everything is defined as code and executed consistently using a single playbook.
 
-## High-Level Flow
-1. Generate SSH key on source EC2
-2. Copy public key
-3. Login to target EC2 using `.pem` key
-4. Add public key to `authorized_keys`
-5. Verify passwordless SSH access
+The automation includes:
 
-## Commands Used (Summary)
-```bash
-ssh-keygen -t ed25519
-cat ~/.ssh/id_ed25519.pub
-chmod 700 ~/.ssh
-chmod 600 ~/.ssh/authorized_keys
-ssh ubuntu@<target-ip>
-Common Issue Explained
+Basic system setup and package management
 
-ssh-copy-id fails on EC2 because password authentication is disabled by default. Manual key installation is required.
+Secure SSH configuration
 
-Reference
+Nginx installation and configuration
 
-Project inspired by hands-on Linux and DevOps learning practices.
+Deployment of a static website
 
+This approach follows real-world configuration management practices used in production environments.
 
----
+Technologies Used
 
-## 3. docs/architecture.md
+Ubuntu Linux
 
-Explains what is happening conceptually (very good for interviews).
+Ansible
 
-```markdown
-# SSH Authentication Architecture
+Nginx
 
-## Components
-- Source EC2 Instance (client)
-- Target EC2 Instance (server)
-- SSH daemon (sshd)
-- Public / Private key pair
+SSH
 
-## Authentication Flow
-1. Client sends public key identity
-2. Server checks `authorized_keys`
-3. Server sends encrypted challenge
-4. Client decrypts using private key
-5. Access granted if validation succeeds
+PuTTY (for Windows users)
 
-## Why EC2 Uses Key Authentication
-- No passwords to brute-force
-- Safer automation
-- Required for CI/CD and cloud scaling
+Project Structure
+ansible-setup/
+├── inventory.ini
+├── setup.yml
+└── roles/
+    ├── base/
+    │   └── tasks/main.yml
+    ├── ssh/
+    │   └── tasks/main.yml
+    ├── nginx/
+    │   └── tasks/main.yml
+    └── app/
+        ├── tasks/main.yml
+        └── files/site.tar.gz
+Roles Description
+Base Role
 
-## Security Notes
-- Private keys never leave the client
-- Public keys are safe to distribute
-- Permissions on `.ssh` are mandatory
+Handles basic server preparation.
+It updates the system, upgrades packages, installs common utilities, and enables fail2ban for basic security.
+
+SSH Role
+
+Configures SSH access by ensuring the user’s public key is added to the authorized keys file.
+This allows passwordless SSH access, which is required for Ansible automation.
+
+Nginx Role
+
+Installs and starts the Nginx web server.
+Ensures the service is enabled and running after deployment.
+
+App Role
+
+Deploys a static HTML website.
+The website is uploaded as a tar archive, extracted into the Nginx web root, and replaces the default Nginx page.
+
+Inventory Configuration
+
+The inventory defines the target server.
+
+Example inventory.ini:
+
+[web]
+localhost ansible_connection=local
+
+This setup is beginner-friendly and allows Ansible to configure the same server it is running on.
+
+How to Run the Project
+
+First, install Ansible on Ubuntu:
+
+sudo apt update
+sudo apt install ansible -y
+
+Clone the repository:
+
+git clone https://github.com/your-username/ansible-configuration-management.git
+cd ansible-configuration-management
+
+Run the full playbook:
+
+ansible-playbook -i inventory.ini setup.yml
+Running Specific Roles Using Tags
+
+Ansible tags allow running only a specific part of the configuration.
+
+Run only the base setup:
+
+ansible-playbook -i inventory.ini setup.yml --tags base
+
+Run only the Nginx role:
+
+ansible-playbook -i inventory.ini setup.yml --tags nginx
+
+Run only the application deployment:
+
+ansible-playbook -i inventory.ini setup.yml --tags app
+Verification
+
+After the playbook completes successfully, open a browser and visit:
+
+http://<server-ip>
+
+You should see the static website deployed by Ansible instead of the default Nginx page.
+
+Key Concepts Learned
+
+This project helps in understanding:
+
+Ansible inventory and playbooks
+
+Role-based project structure
+
+Idempotent configuration management
+
+SSH-based automation
+
+Service management with systemd
+
+Real-world server provisioning workflows
+
+Stretch Goal
+
+The app role can be extended to deploy the website directly from a GitHub repository using the Ansible git module instead of a tar archive.
+
+This makes deployments more dynamic and closer to real production pipelines.
+
+Author
+
+Created as a hands-on learning project to understand configuration management using Ansible.
